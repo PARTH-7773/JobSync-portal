@@ -1,0 +1,259 @@
+  
+    <?php session_start(); ?>
+<?php
+require_once 'config.php';
+
+$conn = getDBConnection();
+
+// Get latest 6 active jobs
+$sql = "SELECT j.*, c.company_name, c.logo 
+        FROM jobs j 
+        JOIN companies c ON j.company_id = c.id 
+        WHERE j.status = 'active' 
+        ORDER BY j.posted_date DESC LIMIT 6";
+$result = $conn->query($sql);
+
+$notif_count = 0;
+if (isset($_SESSION['user_id'])) {
+    $uid = $_SESSION['user_id'];
+    $userName = $_SESSION["full_name"];
+    $n_res = $conn->query("SELECT COUNT(*) as c FROM notifications WHERE user_id = $uid AND is_read = 0");
+    if ($n_res) {
+        $notif_count = $n_res->fetch_assoc()['c'];
+    }
+}
+?>
+
+{/* <!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JobSync - Find Your Dream Career</title>
+    <!-- <link rel="stylesheet" href="./styling/style_ex.css"> -->
+    <!-- <link rel="stylesheet" href="./styling/old-style.css"> -->
+    <link rel="stylesheet" href="./styling/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .btn-primary{
+            padding: 0.6rem 1.5rem;
+            border-radius: 50px;
+            /* Modern rounded buttons */
+            cursor: pointer;
+            font-weight: 500;
+            border: none;
+            display: inline-block;
+            transition: all 0.3s;
+            text-align: center;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+        }
+    </style>
+</head>
+
+<body> */}
+
+
+
+/// Job gride 
+
+
+<div className="jobs-grid">
+            {/* <?php if ($result->num_rows > 0): ?>
+                    <?php while ($job = $result->fetch_assoc()): ?> */}
+            <div className="job-card">
+              <div className="job-header">
+                <h1 className="font-bold text-lg">
+                  {/* <?php echo htmlspecialchars($job['title']); ?> */}SDE
+                </h1>
+                <span className="job-type">
+                  {/* <?php echo htmlspecialchars($job['job_type']); ?> */}
+                  Internship
+                </span>
+              </div>
+              <div className="job-company">
+                <strong>
+                  {/* <?php echo htmlspecialchars($job['company_name']); ?> */}
+                  Genius Dev
+                </strong>
+              </div>
+              <div className="job-details ">
+                <div className="flex items-center ">
+                  <RiMapPinFill color="#667eea" size={20} />
+                  <i className="fas fa-map-marker-alt"></i>
+                  {/* <?php echo htmlspecialchars($job['location']); ?> */}
+                  <span className="font-extralight">Lunawada</span>
+
+                  <RiMoneyCnyCircleLine color="#667eea" className="mr-1" />
+                  <i className="fas fa-map-marker-alt"></i>
+                  <span>20000</span>
+                  {/* <?php echo htmlspecialchars($job['salary_range']); ?> */}
+                </div>
+              </div>
+              <a
+                href="job-details.php?id=<?php echo $job['id']; ?>"
+                className="btn-secondary"
+                style={{
+                  width: "100%",
+                  textAlign: "center",
+                  marginTop: "1rem",
+                }}
+              >
+                View Details
+              </a>
+            </div>
+            {/* <?php endwhile; ?> */}
+            {/* <?php else: ?> */}
+
+            {/* <?php endif; ?> */}
+          </div>
+          <p style={{ gridColumn: "1/-1", textAlign: "center" }}>
+            No jobs posted yet.
+          </p>
+
+
+
+  <section style="padding: 3rem 0;">
+    <div class="container">
+      <div style="background: white; padding: 2rem; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+        <div class="job-header">
+            <h1>
+                        {/* <?php echo htmlspecialchars($job['title']); ?> */}
+            </h1>
+            <span class="job-type">
+                        {/* <?php echo htmlspecialchars($job['job_type']); ?> */}
+            </span>
+         </div>
+              <div style="margin: 1.5rem 0;">
+                    <h2 style="color: #3498db; margin-bottom :1rem;">
+                        <a href="company.php?id=<?php echo $job['company_id']; ?>" style="text-decoration: underline;" class="hover">
+                            {/* <?php echo htmlspecialchars($job['company_name']); ?> */}
+                        </a>
+                    </h2>
+                    <div class="job-details">
+                        <span>📍 
+                            {/* <?php echo htmlspecialchars($job['location']); ?> */}
+                            </span>
+                        <span>💰 
+                            {/* <?php echo htmlspecialchars($job['salary_range']); ?> */}
+                            </span>
+                        <span>📂 
+                            {/* <?php echo htmlspecialchars($job['category']); ?> */}
+                            </span>
+                        <span>📅 
+                            Posted: 
+                            {/* <?php echo date('M d, Y', strtotime($job['posted_date'])); ?> */}
+                            </span>
+                    </div>
+                </div>
+
+                <hr style="margin: 2rem 0;">
+
+                <div style="margin-bottom: 2rem;">
+                    <h3>Job Description</h3>
+                    <p style="line-height: 1.8; color: #555;">
+                        {/* <?php echo nl2br(htmlspecialchars($job['description'])); ?> */}
+                    </p>
+                </div>
+
+                {/* <?php if ($job['requirements']): ?> */}
+                    <div style="margin-bottom: 2rem;">
+                        <h3>Requirements</h3>
+                        <p style="line-height: 1.8; color: #555;">
+                            {/* <?php echo nl2br(htmlspecialchars($job['requirements'])); ?> */}
+                            </p>
+                    </div>
+                {/* <?php endif; ?> */}
+
+                <div style="margin-bottom: 2rem;">
+                    <h3>About Company</h3>
+                    <p style="line-height: 1.8; color: #555;">
+                        {/* <?php echo nl2br(htmlspecialchars($job['company_description'] ?? 'No description available.')); ?> */}
+                        </p>
+                    {/* <?php if ($job['industry']): ?> */}
+                        <p><strong>Industry:</strong> 
+                        {/* <?php echo htmlspecialchars($job['industry']); ?> */}
+                        </p>
+                    {/* <?php endif; ?> */}
+                    {/* <?php if ($job['website']): ?> */}
+                        <p><strong>Website:</strong> <a href="<?php echo htmlspecialchars($job['website']); ?>" target="_blank">
+                            {/* <?php echo htmlspecialchars($job['website']); ?> */}
+                            </a></p>
+                    {/* <?php endif; ?> */}
+                </div>
+
+
+
+                {/* <?php if (isLoggedIn() && isJobSeeker()): ?> */}
+                    <hr style="margin: 2rem 0;">
+
+                    {/* <?php if ($error): ?> */}
+                        <div class="error">
+                            {/* <?php echo $error; ?> */}
+                            </div>
+                    {/* <?php endif; ?> */}
+
+                    {/* <?php if ($success): ?> */}
+                        <div class="success">
+                            {/* <?php echo $success; ?> */}
+                        </div>
+                    {/* <?php else: ?> */}
+                        <div class="form-container" style="margin: 0; box-shadow: none;">
+                            <h3>Apply for this Position</h3>
+                            <form method="POST">
+                                <div class="form-group">
+                                    <label>Cover Letter:</label>
+                                    <textarea name="cover_letter" rows="6" placeholder="Tell us why you're a great fit for this role..." required></textarea>
+                                </div>
+                                <button type="submit" class="btn-primary">Submit Application</button>
+                            </form>
+                            <div style="margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid #eee;">
+                                <p style="font-weight: 600; color: #2c3e50; margin-bottom: 1rem;">Share this job:</p>
+
+                                <div style="display: flex; gap: 10px;">
+                                    <a href="https://wa.me/?text=<?php echo $share_text . ' ' . $share_link; ?>" target="_blank"
+                                        style="background: #25D366; color: white; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; transition: transform 0.2s;">
+                                        <i class="fab fa-whatsapp"></i>
+                                    </a>
+
+                                    <a href="https://www.linkedin.com/sharing/share-offsite/?url=<?php echo $share_link; ?>" target="_blank"
+                                        style="background: #0077b5; color: white; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; transition: transform 0.2s;">
+                                        <i class="fab fa-linkedin-in"></i>
+                                    </a>
+
+                                    <a href="https://twitter.com/intent/tweet?text=<?php echo $share_text; ?>&url=<?php echo $share_link; ?>" target="_blank"
+                                        style="background: #000; color: white; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1rem; transition: transform 0.2s;">
+                                        <i class="fab fa-twitter"></i>
+                                    </a>
+
+                                    <a href="mailto:?subject=Job Opportunity: <?php echo htmlspecialchars($job['title']); ?>&body=<?php echo $share_text . ' ' . $share_link; ?>"
+                                        style="background: #ea4335; color: white; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1rem; transition: transform 0.2s;">
+                                        <i class="fas fa-envelope"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    {/* <?php endif; ?> */}
+                {/* <?php elseif (!isLoggedIn()): ?> */}
+                    <hr style="margin: 2rem 0;">
+                    <p style="text-align: center; padding: 2rem; background: #f8f9fa; border-radius: 5px;">
+                        <a href="login.php" class="btn-primary">Login to Apply</a>
+                    </p>
+                {/* <?php endif; ?> */}
+            </div>
+    </div>
+
+
+  </section>
+
+
